@@ -12,7 +12,13 @@ export default class LoginRouter {
     route(
         httpRequest: HttpRequestInterface,
     ): { statusCode: number; body: string | MissingParamError } {
-        if (!httpRequest || !httpRequest.body) return HttpResponse.serverError();
+        if (
+            !httpRequest ||
+            !httpRequest.body ||
+            !this.authUseCase ||
+            !this.authUseCase.auth
+        )
+            return HttpResponse.serverError();
 
         const { email, password } = httpRequest.body;
 
