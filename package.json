@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "test:staged": "jest",
     "build": "tsc",
     "start": "node dist/server.js",
     "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' -T src/server.ts",
@@ -41,7 +42,8 @@
   "pre-push": {
     "silent": true,
     "run": [
-      "build"
+      "build",
+      "test:staged"
     ]
   },
   "dependencies": {
