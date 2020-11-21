@@ -23,6 +23,7 @@
         "prettier"
     ],
     "rules": {
+        "class-methods-use-this": "off",
         "no-underscore-dangle": "off",
         "no-useless-constructor": "off",
         "no-await-in-loop": 0,

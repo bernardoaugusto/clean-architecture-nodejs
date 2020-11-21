@@ -1,42 +1,5 @@
-/* eslint-disable max-classes-per-file */
-/* eslint-disable class-methods-use-this */
-class LoginRouter {
-    route(httpRequest: {
-        body: { email: string; password: string };
-    }): { statusCode: number; body: string | MissingParamError } {
-        if (!httpRequest || !httpRequest.body) return HttpResponse.serverError();
-
-        const { email, password } = httpRequest.body;
-
-        if (!email) return HttpResponse.badRequest('email');
-        if (!password) return HttpResponse.badRequest('password');
-
-        return { statusCode: 200, body: 'ok' };
-    }
-}
-
-class HttpResponse {
-    static badRequest(paramName: string) {
-        return {
-            statusCode: 400,
-            body: new MissingParamError(paramName),
-        };
-    }
-
-    static serverError() {
-        return {
-            statusCode: 500,
-            body: 'server error',
-        };
-    }
-}
-
-class MissingParamError extends Error {
-    constructor(paramName: string) {
-        super(`Missing param: ${paramName}`);
-        this.name = 'MissingParamError';
-    }
-}
+import MissingParamError from '../../../presentation/helpers/missing-param-error';
+import LoginRouter from '../../../presentation/routers/login-router';
 
 describe('Login Router', () => {
     test('Should return 400 if no email is provided', () => {
