@@ -1,4 +1,5 @@
 import MissingParamError from '../presentation/helpers/missing-param-error';
+import ServerError from '../presentation/helpers/server-error';
 import UnauthorizedError from '../presentation/helpers/unauthorized-error';
 
 export interface HttpResponseOkInterface {
@@ -13,7 +14,7 @@ export interface BadRequestInterface {
 
 export interface ServerErrorInterface {
     statusCode: number;
-    body: string;
+    body: ServerError;
 }
 
 export interface UnauthorizedErrorInterface {

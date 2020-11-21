@@ -1,10 +1,20 @@
+/* eslint-disable max-classes-per-file */
 import { HttpRequestInterface } from '../../../interfaces/httpRequest';
 import { HttpResponseOkInterface } from '../../../interfaces/httpResponse';
 import MissingParamError from '../../../presentation/helpers/missing-param-error';
+import ServerError from '../../../presentation/helpers/server-error';
 import UnauthorizedError from '../../../presentation/helpers/unauthorized-error';
 import LoginRouter from '../../../presentation/routers/login-router';
 
 const makeSut = () => {
+    const authUseCaseSpy = makeAuthUseCaseSpy();
+    authUseCaseSpy.accessToken = 'valid_token';
+    const sut = new LoginRouter(authUseCaseSpy);
+
+    return { sut, authUseCaseSpy };
+};
+
+const makeAuthUseCaseSpy = () => {
     class AuthUseCaseSpy {
         email: string;
 
@@ -19,11 +29,17 @@ const makeSut = () => {
         }
     }
 
-    const authUseCaseSpy = new AuthUseCaseSpy();
-    authUseCaseSpy.accessToken = 'valid_token';
-    const sut = new LoginRouter(authUseCaseSpy);
+    return new AuthUseCaseSpy();
+};
 
-    return { sut, authUseCaseSpy };
+const makeAuthUseCaseSpyWithError = () => {
+    class AuthUseCaseSpy {
+        auth(): void {
+            throw new Error();
+        }
+    }
+
+    return new AuthUseCaseSpy();
 };
 
 describe('Login Router', () => {
@@ -60,6 +76,7 @@ describe('Login Router', () => {
         const httpResponse = sut.route(<any>undefined);
 
         expect(httpResponse.statusCode).toBe(500);
+        expect(httpResponse.body).toEqual(new ServerError());
     });
 
     test('Should return 500 if no httpRequest has no body', () => {
@@ -67,6 +84,7 @@ describe('Login Router', () => {
         const httpResponse = sut.route(<any>{});
 
         expect(httpResponse.statusCode).toBe(500);
+        expect(httpResponse.body).toEqual(new ServerError());
     });
 
     test('Should call AuthUseCase with correct params', () => {
@@ -129,6 +147,7 @@ describe('Login Router', () => {
         const httpResponse = sut.route(httpRequest);
 
         expect(httpResponse.statusCode).toBe(500);
+        expect(httpResponse.body).toEqual(new ServerError());
     });
 
     test('Should return 500 if AuthUseCase has no auth method', () => {
@@ -143,5 +162,23 @@ describe('Login Router', () => {
         const httpResponse = sut.route(httpRequest);
 
         expect(httpResponse.statusCode).toBe(500);
+        expect(httpResponse.body).toEqual(new ServerError());
+    });
+
+    test('Shound return 500 id AuthUseCase throws', () => {
+        const authUseCaseSpy = makeAuthUseCaseSpyWithError();
+        const sut = new LoginRouter(authUseCaseSpy);
+
+        const httpRequest: HttpRequestInterface = {
+            body: {
+                email: 'any_email@mail.com',
+                password: 'any_password',
+            },
+        };
+
+        const httpResponse = sut.route(httpRequest);
+
+        expect(httpResponse.statusCode).toBe(500);
+        expect(httpResponse.body).toEqual(new ServerError());
     });
 });

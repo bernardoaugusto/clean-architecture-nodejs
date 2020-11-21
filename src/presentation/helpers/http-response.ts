@@ -5,6 +5,7 @@ import {
     UnauthorizedErrorInterface,
 } from '../../interfaces/httpResponse';
 import MissingParamError from './missing-param-error';
+import ServerError from './server-error';
 import UnauthorizedError from './unauthorized-error';
 
 export default class HttpResponse {
@@ -18,7 +19,7 @@ export default class HttpResponse {
     static serverError(): ServerErrorInterface {
         return {
             statusCode: 500,
-            body: 'server error',
+            body: new ServerError(),
         };
     }
 
