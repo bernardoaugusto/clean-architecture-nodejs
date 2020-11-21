@@ -1,4 +1,5 @@
 import { HttpRequestInterface } from '../../../interfaces/httpRequest';
+import { HttpResponseOkInterface } from '../../../interfaces/httpResponse';
 import MissingParamError from '../../../presentation/helpers/missing-param-error';
 import UnauthorizedError from '../../../presentation/helpers/unauthorized-error';
 import LoginRouter from '../../../presentation/routers/login-router';
@@ -84,7 +85,7 @@ describe('Login Router', () => {
     });
 
     test('Should return 200 when valid credentials are provided', () => {
-        const { sut } = makeSut();
+        const { sut, authUseCaseSpy } = makeSut();
 
         const httpRequest: HttpRequestInterface = {
             body: {
@@ -93,9 +94,10 @@ describe('Login Router', () => {
             },
         };
 
-        const httpResponse = sut.route(httpRequest);
+        const httpResponse = sut.route(httpRequest) as HttpResponseOkInterface;
 
         expect(httpResponse.statusCode).toBe(200);
+        expect(httpResponse.body.accessToken).toEqual(authUseCaseSpy.accessToken);
     });
 
     test('Should return 401 when invalid credentials are provided', () => {

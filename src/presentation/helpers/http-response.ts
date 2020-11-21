@@ -29,10 +29,10 @@ export default class HttpResponse {
         };
     }
 
-    static ok(): HttpResponseOkInterface {
+    static ok(accessToken: string): HttpResponseOkInterface {
         return {
             statusCode: 200,
-            body: 'ok',
+            body: { accessToken },
         };
     }
 }

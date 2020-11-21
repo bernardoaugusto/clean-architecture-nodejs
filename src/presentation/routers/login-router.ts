@@ -1,6 +1,11 @@
 import { HttpRequestInterface } from '../../interfaces/httpRequest';
 import HttpResponse from '../helpers/http-response';
-import { HttpResponseInterface } from '../../interfaces/httpResponse';
+import {
+    BadRequestInterface,
+    ServerErrorInterface,
+    HttpResponseOkInterface,
+    UnauthorizedErrorInterface,
+} from '../../interfaces/httpResponse';
 
 export default class LoginRouter {
     authUseCase: any;
@@ -9,7 +14,13 @@ export default class LoginRouter {
         this.authUseCase = authUseCase;
     }
 
-    route(httpRequest: HttpRequestInterface): HttpResponseInterface {
+    route(
+        httpRequest: HttpRequestInterface,
+    ):
+        | HttpResponseOkInterface
+        | BadRequestInterface
+        | ServerErrorInterface
+        | UnauthorizedErrorInterface {
         if (
             !httpRequest ||
             !httpRequest.body ||
@@ -27,6 +38,6 @@ export default class LoginRouter {
 
         if (!accessToken) return HttpResponse.unauthorizedError();
 
-        return HttpResponse.ok();
+        return HttpResponse.ok(accessToken);
     }
 }

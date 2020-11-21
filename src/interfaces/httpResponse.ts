@@ -1,17 +1,12 @@
 import MissingParamError from '../presentation/helpers/missing-param-error';
 import UnauthorizedError from '../presentation/helpers/unauthorized-error';
 
-export interface HttpResponseInterface {
+export interface HttpResponseOkInterface {
     statusCode: number;
-    body: string | MissingParamError | UnauthorizedError;
+    body: { accessToken: string };
 }
 
-export interface HttpResponseOkInterface extends HttpResponseInterface {
-    statusCode: number;
-    body: string;
-}
-
-export interface BadRequestInterface extends HttpResponseInterface {
+export interface BadRequestInterface {
     statusCode: number;
     body: MissingParamError;
 }
