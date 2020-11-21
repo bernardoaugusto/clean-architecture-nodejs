@@ -1,5 +1,6 @@
 import {
     BadRequestInterface,
+    HttpResponseOkInterface,
     ServerErrorInterface,
     UnauthorizedErrorInterface,
 } from '../../interfaces/httpResponse';
@@ -25,6 +26,13 @@ export default class HttpResponse {
         return {
             statusCode: 401,
             body: new UnauthorizedError(),
+        };
+    }
+
+    static ok(): HttpResponseOkInterface {
+        return {
+            statusCode: 200,
+            body: 'ok',
         };
     }
 }

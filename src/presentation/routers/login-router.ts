@@ -1,6 +1,6 @@
 import { HttpRequestInterface } from '../../interfaces/httpRequest';
-import MissingParamError from '../helpers/missing-param-error';
 import HttpResponse from '../helpers/http-response';
+import { HttpResponseInterface } from '../../interfaces/httpResponse';
 
 export default class LoginRouter {
     authUseCase: any;
@@ -9,9 +9,7 @@ export default class LoginRouter {
         this.authUseCase = authUseCase;
     }
 
-    route(
-        httpRequest: HttpRequestInterface,
-    ): { statusCode: number; body: string | MissingParamError } {
+    route(httpRequest: HttpRequestInterface): HttpResponseInterface {
         if (
             !httpRequest ||
             !httpRequest.body ||
@@ -25,8 +23,10 @@ export default class LoginRouter {
         if (!email) return HttpResponse.badRequest('email');
         if (!password) return HttpResponse.badRequest('password');
 
-        this.authUseCase.auth(email, password);
+        const accessToken = this.authUseCase.auth(email, password);
 
-        return HttpResponse.unauthorizedError();
+        if (!accessToken) return HttpResponse.unauthorizedError();
+
+        return HttpResponse.ok();
     }
 }
