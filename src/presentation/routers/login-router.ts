@@ -14,20 +14,21 @@ export default class LoginRouter {
         this.authUseCase = authUseCase;
     }
 
-    route(
+    async route(
         httpRequest: HttpRequestInterface,
-    ):
+    ): Promise<
         | HttpResponseOkInterface
         | BadRequestInterface
         | ServerErrorInterface
-        | UnauthorizedErrorInterface {
+        | UnauthorizedErrorInterface
+    > {
         try {
             const { email, password } = httpRequest.body;
 
             if (!email) return HttpResponse.badRequest('email');
             if (!password) return HttpResponse.badRequest('password');
 
-            const accessToken = this.authUseCase.auth(email, password);
+            const accessToken = await this.authUseCase.auth(email, password);
 
             if (!accessToken) return HttpResponse.unauthorizedError();
 
