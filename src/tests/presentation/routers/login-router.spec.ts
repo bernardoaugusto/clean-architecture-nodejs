@@ -1,6 +1,7 @@
 /* eslint-disable max-classes-per-file */
 import { HttpRequestInterface } from '../../../interfaces/httpRequest';
 import { HttpResponseOkInterface } from '../../../interfaces/httpResponse';
+import InvalidParamError from '../../../presentation/helpers/invalid-param-error copy';
 import MissingParamError from '../../../presentation/helpers/missing-param-error';
 import ServerError from '../../../presentation/helpers/server-error';
 import UnauthorizedError from '../../../presentation/helpers/unauthorized-error';
@@ -9,9 +10,22 @@ import LoginRouter from '../../../presentation/routers/login-router';
 const makeSut = () => {
     const authUseCaseSpy = makeAuthUseCaseSpy();
     authUseCaseSpy.accessToken = 'valid_token';
-    const sut = new LoginRouter(authUseCaseSpy);
+    const emailValidatorSpy = makeEmailValidator();
+    emailValidatorSpy.isEmailValid = true;
+    const sut = new LoginRouter(authUseCaseSpy, emailValidatorSpy);
 
-    return { sut, authUseCaseSpy };
+    return { sut, authUseCaseSpy, emailValidatorSpy };
+};
+
+const makeEmailValidator = () => {
+    class EmailValidatorSpy {
+        isEmailValid: any;
+
+        isValid(email: string) {
+            return this.isEmailValid;
+        }
+    }
+    return new EmailValidatorSpy();
 };
 
 const makeAuthUseCaseSpy = () => {
@@ -138,7 +152,7 @@ describe('Login Router', () => {
     });
 
     test('Should return 500 if no AuthUseCase is provided', async () => {
-        const sut = new LoginRouter(<any>undefined);
+        const sut = new LoginRouter(<any>undefined, <any>undefined);
         const httpRequest: HttpRequestInterface = {
             body: {
                 email: 'any_email@mail.com',
@@ -153,7 +167,7 @@ describe('Login Router', () => {
     });
 
     test('Should return 500 if AuthUseCase has no auth method', async () => {
-        const sut = new LoginRouter(<any>{});
+        const sut = new LoginRouter(<any>{}, <any>{});
         const httpRequest: HttpRequestInterface = {
             body: {
                 email: 'any_email@mail.com',
@@ -169,7 +183,7 @@ describe('Login Router', () => {
 
     test('Shound return 500 id AuthUseCase throws', async () => {
         const authUseCaseSpy = makeAuthUseCaseSpyWithError();
-        const sut = new LoginRouter(authUseCaseSpy);
+        const sut = new LoginRouter(authUseCaseSpy, <any>undefined);
 
         const httpRequest: HttpRequestInterface = {
             body: {
@@ -182,5 +196,21 @@ describe('Login Router', () => {
 
         expect(httpResponse.statusCode).toBe(500);
         expect(httpResponse.body).toEqual(new ServerError());
+    });
+
+    test('Should return 400 if an invalid email is provided', async () => {
+        const { sut, emailValidatorSpy } = makeSut();
+        emailValidatorSpy.isEmailValid = false;
+        const httpRequest = {
+            body: {
+                email: 'invalid_email@mail.com',
+                password: 'any_password',
+            },
+        };
+
+        const httpResponse = await sut.route(<any>httpRequest);
+
+        expect(httpResponse.statusCode).toBe(400);
+        expect(httpResponse.body).toEqual(new InvalidParamError('email'));
     });
 });

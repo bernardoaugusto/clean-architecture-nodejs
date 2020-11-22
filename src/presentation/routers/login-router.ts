@@ -7,12 +7,16 @@ import {
     UnauthorizedErrorInterface,
 } from '../../interfaces/httpResponse';
 import MissingParamError from '../helpers/missing-param-error';
+import InvalidParamError from '../helpers/invalid-param-error copy';
 
 export default class LoginRouter {
     authUseCase: any;
 
-    constructor(authUseCase: any) {
+    emailValidator: any;
+
+    constructor(authUseCase: any, emailValidator: any) {
         this.authUseCase = authUseCase;
+        this.emailValidator = emailValidator;
     }
 
     async route(
@@ -28,6 +32,10 @@ export default class LoginRouter {
 
             if (!email)
                 return HttpResponse.badRequest(new MissingParamError('email'));
+
+            if (!this.emailValidator.isValid(email))
+                return HttpResponse.badRequest(new InvalidParamError('email'));
+
             if (!password)
                 return HttpResponse.badRequest(new MissingParamError('password'));
 

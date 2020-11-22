@@ -4,7 +4,6 @@ import {
     ServerErrorInterface,
     UnauthorizedErrorInterface,
 } from '../../interfaces/httpResponse';
-import MissingParamError from './missing-param-error';
 import ServerError from './server-error';
 import UnauthorizedError from './unauthorized-error';
 
