@@ -9,10 +9,10 @@ import ServerError from './server-error';
 import UnauthorizedError from './unauthorized-error';
 
 export default class HttpResponse {
-    static badRequest(paramName: string): BadRequestInterface {
+    static badRequest(error: Error): BadRequestInterface {
         return {
             statusCode: 400,
-            body: new MissingParamError(paramName),
+            body: error,
         };
     }
 
